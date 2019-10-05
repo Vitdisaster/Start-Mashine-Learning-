@@ -1,0 +1,97 @@
+import pandas as pd
+money = pd.read_csv("C:\\Users\\vetal\\.anaconda\\Work\\ml_rate_2018-2019.csv")
+
+rates["curs"]
+import matplotlib.pyplot as P
+curs = rates["curs"]
+P.plot(curs)
+
+past = 7 * 4 # last 4 weeks
+future = 7 # 7 days later
+values = money["curs"]
+start = past 
+end = len(values) - future
+
+prepared = []
+
+for i in range(start, end):
+    past_and_future_values = values[(i-past):(i+future)]
+    prepared.append(list(past_and_future_values))
+    past_columns = [f"past_{i}" for i in range(past)]
+    
+future_columns = [f"future_{i}" for i in range(future)]
+df = pd.DataFrame(prepared, columns = (past_columns+future_columns))
+
+from sklearn.linear_model import LinearRegression
+LinReg = LinearRegression()
+
+#Обучающая 
+x = df[past_columns][:-1]
+y = df[future_columns][:-1]
+
+#Тестовая
+x_test = df[past_columns][-1:]
+y_test = df[future_columns][-1:]
+
+LinReg.fit(x,y)
+prediction = LinReg.predict(x_test)
+
+import numpy as np
+from sklearn.metrics import mean_absolute_error
+
+np.linalg.norm(y_test - prediction)  
+# 1.4763743816775214
+mean_absolute_error(y_test, prediction) 
+#0.4444969217982556
+
+P.plot(prediction[0], label="prediction")
+P.plot(y_test.iloc[0], label="real")
+P.legend()
+
+import sklearn
+from sklearn.neural_network import MLPRegressor
+
+MLP = MLPRegressor(random_state = 42, max_iter = 700, hidden_layer_sizes=(70,150) )
+MLP.fit(x,y)
+prediction = MLP.predict(x_test)
+
+print("np.linalg.norm", np.linalg.norm(y_test - prediction))
+# np.linalg.norm 1.3167854597334177
+print("mean_absolute_error", mean_absolute_error(y_test, prediction))
+# mean_absolute_error 0.4003337185288639
+
+
+P.plot(prediction[0], label="prediction")
+P.plot(y_test.iloc[0], label="real")
+P.legend()
+
+from sklearn.linear_model import ElasticNet
+EN = ElasticNet(random_state = 42, max_iter = 700, alpha=2, l1_ratio=0.1)
+EN.fit(x,y)
+prediction = EN.predict(x_test)
+
+print("np.linalg.norm", np.linalg.norm(y_test - prediction))
+# np.linalg.norm 1.3045086340526806
+print("mean_absolute_error", mean_absolute_error(y_test, prediction))
+# mean_absolute_error 0.38191197149065
+
+
+P.plot(prediction[0], label="prediction")
+P.plot(y_test.iloc[0], label="real")
+P.legend()
+
+from sklearn.neighbors import KNeighborsRegressor
+KN = KNeighborsRegressor(algorithm='auto', n_neighbors=2, weights='distance')
+KN.fit(x, y)
+
+prediction = KN.predict(x_test)
+
+print("np.linalg.norm", np.linalg.norm(y_test - prediction))
+# np.linalg.norm 0.7412459885490877
+print("mean_absolute_error", mean_absolute_error(y_test, prediction))
+# mean_absolute_error 0.24117946971851925
+ 
+
+P.plot(prediction[0], label="prediction")
+P.plot(y_test.iloc[0], label="real")
+P.legend()
